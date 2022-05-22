@@ -330,11 +330,11 @@ class SeriesTest < ActiveSupport::TestCase
     course = create :course
     series = create :series, course: course, deadline: Time.current
     content_pages = create_list :content_page, 2
-    SeriesMembership.create(series: series, activity: content_pages[0])
-    SeriesMembership.create(series: series, activity: content_pages[1])
+    SeriesMembership.create(series:, activity: content_pages[0])
+    SeriesMembership.create(series:, activity: content_pages[1])
     exercises = create_list :exercise, 2
-    SeriesMembership.create(series: series, activity: exercises[0])
-    SeriesMembership.create(series: series, activity: exercises[1])
+    SeriesMembership.create(series:, activity: exercises[0])
+    SeriesMembership.create(series:, activity: exercises[1])
     users = create_list(:user, 6, courses: [course])
 
     expected_submissions = []
@@ -366,24 +366,24 @@ class SeriesTest < ActiveSupport::TestCase
           expected_submissions << s.id
         when 2 # Wrong submission after deadline
           create :wrong_submission,
-                 exercise: exercise,
+                 exercise:,
                  user: u,
                  created_at: (deadline + 2.minutes),
-                 course: course
+                 course:
         when 3 # Correct submission after deadline
           create :correct_submission,
-                 exercise: exercise,
+                 exercise:,
                  user: u,
                  created_at: (deadline + 2.minutes),
-                 course: course
+                 course:
         when 4 # Correct submission before deadline not in course
           create :correct_submission,
-                 exercise: exercise,
+                 exercise:,
                  user: u,
                  created_at: (deadline - 2.minutes)
         when 5 # Correct submission after deadline not in course
           create :correct_submission,
-                 exercise: exercise,
+                 exercise:,
                  user: u,
                  created_at: (deadline + 2.minutes)
         end
@@ -396,7 +396,7 @@ class SeriesTest < ActiveSupport::TestCase
           a = create :activity_read_state, activity: cp, user: u, course: course, created_at: (deadline - 2.minutes)
           expected_read_states << a.id
         else
-          create :activity_read_state, activity: cp, user: u, course: course, created_at: (deadline + 2.minutes)
+          create :activity_read_state, activity: cp, user: u, course:, created_at: (deadline + 2.minutes)
         end
       end
     end
@@ -430,7 +430,7 @@ class SeriesTest < ActiveSupport::TestCase
            user: user,
            created_at: (deadline - 2.minutes)
 
-    assert_equal false, series.completed?(user: user)
+    assert_equal false, series.completed?(user:)
     assert_equal false, series.completed_before_deadline?(user)
   end
 
@@ -446,7 +446,7 @@ class SeriesTest < ActiveSupport::TestCase
            user: user,
            created_at: (deadline - 2.minutes)
 
-    assert_equal true, series.completed?(user: user)
+    assert_equal true, series.completed?(user:)
     assert_equal true, series.completed_before_deadline?(user)
   end
 
@@ -461,7 +461,7 @@ class SeriesTest < ActiveSupport::TestCase
            user: user,
            created_at: (deadline - 2.minutes)
 
-    assert_equal false, series.completed?(user: user)
+    assert_equal false, series.completed?(user:)
     assert_equal false, series.completed_before_deadline?(user)
   end
 
@@ -476,7 +476,7 @@ class SeriesTest < ActiveSupport::TestCase
            user: user,
            created_at: (deadline + 2.minutes)
 
-    assert_equal false, series.completed?(user: user)
+    assert_equal false, series.completed?(user:)
     assert_equal false, series.completed_before_deadline?(user)
   end
 
@@ -492,7 +492,7 @@ class SeriesTest < ActiveSupport::TestCase
            user: user,
            created_at: (deadline + 2.minutes)
 
-    assert_equal true, series.completed?(user: user)
+    assert_equal true, series.completed?(user:)
     assert_equal false, series.completed_before_deadline?(user)
   end
 
@@ -507,7 +507,7 @@ class SeriesTest < ActiveSupport::TestCase
            user: user,
            created_at: (deadline + 2.minutes)
 
-    assert_equal false, series.completed?(user: user)
+    assert_equal false, series.completed?(user:)
     assert_equal false, series.completed_before_deadline?(user)
   end
 
@@ -523,7 +523,7 @@ class SeriesTest < ActiveSupport::TestCase
            course: series.course,
            created_at: (deadline - 2.minutes)
 
-    assert_equal false, series.completed?(user: user)
+    assert_equal false, series.completed?(user:)
     assert_equal false, series.completed_before_deadline?(user)
   end
 
@@ -547,7 +547,7 @@ class SeriesTest < ActiveSupport::TestCase
            course: series.course,
            created_at: (deadline - 2.minutes)
 
-    assert_equal false, series.completed?(user: user)
+    assert_equal false, series.completed?(user:)
     assert_equal false, series.completed_before_deadline?(user)
   end
 
@@ -556,7 +556,7 @@ class SeriesTest < ActiveSupport::TestCase
     user = create :user
     deadline = series.deadline
 
-    assert_equal false, series.completed?(user: user)
+    assert_equal false, series.completed?(user:)
     assert_equal false, series.completed_before_deadline?(user)
 
     # Correct submission before deadline
@@ -566,7 +566,7 @@ class SeriesTest < ActiveSupport::TestCase
            course: series.course,
            created_at: (deadline - 2.minutes)
 
-    assert_equal false, series.completed?(user: user)
+    assert_equal false, series.completed?(user:)
     assert_equal false, series.completed_before_deadline?(user)
 
     # Read before deadline
@@ -576,7 +576,7 @@ class SeriesTest < ActiveSupport::TestCase
            course: series.course,
            created_at: (deadline - 2.minutes)
 
-    assert_equal true, series.completed?(user: user)
+    assert_equal true, series.completed?(user:)
     assert_equal true, series.completed_before_deadline?(user)
   end
 
@@ -586,7 +586,7 @@ class SeriesTest < ActiveSupport::TestCase
     deadline = series.deadline
 
     # unread
-    assert_equal false, series.completed?(user: user)
+    assert_equal false, series.completed?(user:)
     assert_equal false, series.completed_before_deadline?(user)
 
     # read after deadline
@@ -596,7 +596,7 @@ class SeriesTest < ActiveSupport::TestCase
            course: series.course,
            created_at: (deadline + 2.minutes)
 
-    assert_equal true, series.completed?(user: user)
+    assert_equal true, series.completed?(user:)
     assert_equal false, series.completed_before_deadline?(user)
   end
 
@@ -606,7 +606,7 @@ class SeriesTest < ActiveSupport::TestCase
     deadline = series.deadline
 
     # unread
-    assert_equal false, series.completed?(user: user)
+    assert_equal false, series.completed?(user:)
     assert_equal false, series.completed_before_deadline?(user)
 
     # read before deadline
@@ -616,7 +616,7 @@ class SeriesTest < ActiveSupport::TestCase
            course: series.course,
            created_at: (deadline - 2.minutes)
 
-    assert_equal true, series.completed?(user: user)
+    assert_equal true, series.completed?(user:)
     assert_equal true, series.completed_before_deadline?(user)
   end
 end
